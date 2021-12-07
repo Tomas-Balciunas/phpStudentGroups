@@ -16,12 +16,17 @@ class Tasks
     private $studentProject;
     private $updateGroup;
     private $studentId;
+    private $deleteId;
+    private $validationId;
+    private $validationGroup;
 
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
         $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
+
+    //------------------------------------------------- CREATE PROJECT ----------------------------------------------------
 
     public function createProject($post)
     {
@@ -45,6 +50,8 @@ class Tasks
         }
     }
 
+    //------------------------------------------------- STUDENT PROJECT LIST ----------------------------------------------------
+
     public function listProjects()
     {
         try {
@@ -56,6 +63,8 @@ class Tasks
             throw $msg;
         }
     }
+
+    //------------------------------------------------- STUDENT LIST ----------------------------------------------------
 
     public function listStudents()
     {
@@ -69,6 +78,8 @@ class Tasks
         }
     }
 
+    //------------------------------------------------- ADD STUDENT TO A LIST ----------------------------------------------------
+
     public function addStudent($id, $post)
     {
         $this->studentName = $post['student'];
@@ -78,10 +89,16 @@ class Tasks
             $this->studentGroup = $post['studentGroup'];
         }
         $this->studentProject = $id;
-        $this->execAddStudent();
+
+        if ($this->freeGroup($id, $post['studentGroup'])) {
+            $this->execAddStudent();
+        } else {
+            echo '<h3>This group is full</h3>';
+        }
     }
 
-    public function execAddStudent () {
+    public function execAddStudent()
+    {
         try {
             $query = "INSERT INTO nfq.students (`name`, `project`, `group`) VALUES (:name, :project, :group)";
             $stmt = $this->pdo->prepare($query);
@@ -94,18 +111,26 @@ class Tasks
         }
     }
 
+    //------------------------------------------------- STUDENT UPDATE ----------------------------------------------------
+
     public function updateStudent($id, $post)
     {
         $this->studentId = $id;
-        if ($post['studentGroup'] == 0) {
-            $this->updateGroup = null;
+        $post['studentGroup'] == 0 ? $this->updateGroup = null : $this->updateGroup = $post['studentGroup'];
+
+        if ($this->updateGroup == null) {
+            $this->execUpdateStudent();
         } else {
-            $this->updateGroup = $post['studentGroup'];
+            if ($this->freeGroup($post['projectId'], $post['studentGroup'])) {
+                $this->execUpdateStudent();
+            } else {
+                echo '<h3>This group is full</h3>';
+            }
         }
-        $this->execUpdateStudent();
     }
 
-    public function execUpdateStudent () {
+    public function execUpdateStudent()
+    {
         try {
             $query = "UPDATE nfq.students SET `group` = :group WHERE id = :id";
             $stmt = $this->pdo->prepare($query);
@@ -117,7 +142,25 @@ class Tasks
         }
     }
 
-    public static function groups ($pr, $st) {
+    //------------------------------------------------- DELETE STUDENT FROM THE LIST ----------------------------------------------------
+
+    public function deleteStudent($id)
+    {
+        try {
+            $this->deleteId = $id;
+            $query = "DELETE FROM nfq.students WHERE id = :id";
+            $stmt = $this->pdo->prepare($query);
+            $stmt->bindParam(':id', $this->deleteId, PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (PDOException $msg) {
+            throw $msg;
+        }
+    }
+
+    //------------------------------------------------- ARRAY THAT SORTS GROUPS ----------------------------------------------------
+
+    public static function groups($pr, $st)
+    {
         $array = [];
 
         foreach ($pr as $e) {
@@ -141,5 +184,28 @@ class Tasks
         }
 
         return $array;
+    }
+
+    //------------------------------------------------- CHECKS IF THE GROUP IS FREE ----------------------------------------------------
+
+    public function freeGroup($project, $group)
+    {
+        $arr = [];
+        $this->validationId = $project;
+        $this->validationGroup = $group;
+        $query = "SELECT students_per_group FROM nfq.projects WHERE id = :id; SELECT * FROM nfq.students WHERE project = :id AND `group` = :group";
+        $stmt = $this->pdo->prepare($query);
+        $stmt->bindParam(':id', $this->validationId, PDO::PARAM_INT);
+        $stmt->bindParam(':group', $this->validationGroup, PDO::PARAM_INT);
+        $stmt->execute();
+        $arr['count'] = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->nextRowset();
+        $arr['list'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (sizeof($arr['list']) < $arr['count']['students_per_group']) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

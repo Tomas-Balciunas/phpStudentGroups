@@ -19,13 +19,13 @@ if (isset($_POST['submit'])) {
     }
 }
 
-$showProjects = new Tasks($connection);
-$projects = $showProjects->listProjects();
+// $showProjects = new Tasks($connection);
+// $projects = $showProjects->listProjects();
 
-$showStudents = new Tasks($connection);
-$students = $showStudents->listStudents();
+// $showStudents = new Tasks($connection);
+// $students = $showStudents->listStudents();
 
-$groups = Tasks::groups($projects, $students);
+// $groups = Tasks::groups($projects, $students);
 
 require "view/pages/home.view.php";
 
