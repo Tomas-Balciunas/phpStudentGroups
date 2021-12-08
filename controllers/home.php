@@ -4,9 +4,8 @@ use NFQ\DB;
 use NFQ\Tasks;
 use NFQ\Validation;
 
-$connection = DB::connect();
-
 if (isset($_POST['submit'])) {
+    $connection = DB::connect();
     $validation = Validation::project($_POST);
 
     if (empty(implode('', $validation))) {
@@ -28,6 +27,3 @@ if (isset($_POST['submit'])) {
 // $groups = Tasks::groups($projects, $students);
 
 require "view/pages/home.view.php";
-
-
-

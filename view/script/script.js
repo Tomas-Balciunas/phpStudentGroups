@@ -2,7 +2,13 @@ new Vue({
     el: '#app',
     data: {
         data: '',
-        err: ''
+        info: ''
+    },
+    watch: {
+        info: function () {
+            clearTimeout(this.timeId);
+            this.timeId = setTimeout(() => this.info = '', 3000)
+        }
     },
     methods: {
         updateStudent: function (id) {
@@ -14,7 +20,7 @@ new Vue({
                     headers: { 'Content-Type': 'multipart/form-data' }
                 }
             })
-                .then((data) => { this.err = data.data })
+                .then((data) => { this.info = data.data })
                 .then(setTimeout(() => this.fetchData(), 200))
                 .catch(function (response) { console.log('error', response); });
         },
@@ -28,7 +34,7 @@ new Vue({
                     headers: { 'Content-Type': 'multipart/form-data' }
                 }
             })
-                .then((data) => { this.err = data.data })
+                .then((data) => { this.info = data.data })
                 .then(setTimeout(() => this.fetchData(), 200))
                 .catch(function (response) { console.log('error', response); });
         },
@@ -42,7 +48,7 @@ new Vue({
                     headers: { 'Content-Type': 'multipart/form-data' }
                 }
             })
-                .then((data) => { this.err = data.data })
+                .then((data) => { this.info = data.data })
                 .then(setTimeout(() => this.fetchData(), 200))
                 .catch(function (response) { console.log('error', response); });
         },

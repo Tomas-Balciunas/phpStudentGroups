@@ -30,9 +30,9 @@ class Tasks
 
     public function createProject($post)
     {
-        $this->title = $post['title'];
-        $this->groups = $post['groups'];
-        $this->students = $post['studentsPerGroup'];
+        $this->title = htmlspecialchars(strip_tags($post['title']));
+        $this->groups = htmlspecialchars(strip_tags($post['groups']));
+        $this->students = htmlspecialchars(strip_tags($post['studentsPerGroup']));
         $this->execCreateProject();
     }
 
@@ -82,18 +82,15 @@ class Tasks
 
     public function addStudent($id, $post)
     {
-        $this->studentName = $post['student'];
-        if ($post['studentGroup'] == 0) {
-            $this->studentGroup = null;
-        } else {
-            $this->studentGroup = $post['studentGroup'];
-        }
+        $this->studentName = htmlspecialchars(strip_tags($post['student']));
+        $post['studentGroup'] == 0 ? $this->studentGroup = null : $this->studentGroup = htmlspecialchars(strip_tags($post['studentGroup']));
         $this->studentProject = $id;
 
         if ($this->freeGroup($id, $post['studentGroup'])) {
             $this->execAddStudent();
+            return $msg['msg'] = "Student ".$this->studentName." added";
         } else {
-            echo '<h3>This group is full</h3>';
+            return $msg['msg'] = 'Selected group is full';
         }
     }
 
@@ -115,16 +112,18 @@ class Tasks
 
     public function updateStudent($id, $post)
     {
+        $msg = [];
         $this->studentId = $id;
-        $post['studentGroup'] == 0 ? $this->updateGroup = null : $this->updateGroup = $post['studentGroup'];
+        $post['studentGroup'] == 0 ? $this->updateGroup = null : $this->updateGroup = htmlspecialchars(strip_tags($post['studentGroup']));
 
         if ($this->updateGroup == null) {
             $this->execUpdateStudent();
         } else {
             if ($this->freeGroup($post['projectId'], $post['studentGroup'])) {
                 $this->execUpdateStudent();
+                return $msg['msg'] = "Group changed";
             } else {
-                echo '<h3>This group is full</h3>';
+                return $msg['msg'] = 'Selected group is full';
             }
         }
     }
@@ -191,8 +190,8 @@ class Tasks
     public function freeGroup($project, $group)
     {
         $arr = [];
-        $this->validationId = $project;
-        $this->validationGroup = $group;
+        $this->validationId = htmlspecialchars(strip_tags($project));
+        $this->validationGroup = htmlspecialchars(strip_tags($group));
         $query = "SELECT students_per_group FROM nfq.projects WHERE id = :id; SELECT * FROM nfq.students WHERE project = :id AND `group` = :group";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':id', $this->validationId, PDO::PARAM_INT);
