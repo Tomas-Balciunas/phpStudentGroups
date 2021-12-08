@@ -7,3 +7,4 @@ Projektų kūrimas ir moksleivio pridėjimas turi validaciją.
 Taip pat tikrinama ar grupė yra pilna.
 Nepraeinant validacijos ar esant pilnai grupei rodoma informacija viršuje.
 Vienintelis kabliukas kurio dėl laiko stokos nepataisiau, tai jei atnaujinant grupę ji yra pilna, select'e užsilieka pasirinkta grupė.
+dbscript aplanke yra tables.php failas, kurį paleidžiant per cli localhost'e sukuriamos lentelės nfq duomenų bazėje.
