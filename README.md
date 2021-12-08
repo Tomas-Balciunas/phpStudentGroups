@@ -1,3 +1,5 @@
+Live versija: https://sheltered-lake-64321.herokuapp.com/ 
+
 Back-end panaudota PHP, o front-end Vue.js karkasas bei bootstrap.
 
 Pradžioje atvaizdavimui naudojau tik php ir bs (kas matosi old.view.php), tačiau vartotojo patogumui perėjau prie vue.js pridedant/trinant moksleivį bei atnaujinant grupę.
