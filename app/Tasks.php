@@ -88,9 +88,9 @@ class Tasks
 
         if ($this->freeGroup($id, $post['studentGroup'])) {
             $this->execAddStudent();
-            return $msg['msg'] = "Student ".$this->studentName." added";
+            return $msg['msg'] = "Student " . $this->studentName . " added";
         } else {
-            return $msg['msg'] = 'Selected group is full';
+            return $msg['msg'] = 'Selected group is either full or an invalid group has been selected';
         }
     }
 
@@ -123,7 +123,7 @@ class Tasks
                 $this->execUpdateStudent();
                 return $msg['msg'] = "Group changed";
             } else {
-                return $msg['msg'] = 'Selected group is full';
+                return $msg['msg'] = 'Selected group is either full or an invalid group has been selected';
             }
         }
     }
@@ -185,21 +185,26 @@ class Tasks
         return $array;
     }
 
-    //------------------------------------------------- CHECKS IF THE GROUP IS FREE ----------------------------------------------------
+    //------------------------------------------------- CHECKS IF THE GROUP IS FREE OR VALID ----------------------------------------------------
 
     public function freeGroup($project, $group)
     {
         $arr = [];
         $this->validationId = htmlspecialchars(strip_tags($project));
         $this->validationGroup = htmlspecialchars(strip_tags($group));
-        $query = "SELECT students_per_group FROM nfq.projects WHERE id = :id; SELECT * FROM nfq.students WHERE project = :id AND `group` = :group";
+        $query = "SELECT * FROM nfq.projects WHERE id = :id; SELECT * FROM nfq.students WHERE project = :id AND `group` = :group";
         $stmt = $this->pdo->prepare($query);
         $stmt->bindParam(':id', $this->validationId, PDO::PARAM_INT);
         $stmt->bindParam(':group', $this->validationGroup, PDO::PARAM_INT);
         $stmt->execute();
         $arr['count'] = $stmt->fetch(PDO::FETCH_ASSOC);
-        $stmt->nextRowset();
-        $arr['list'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if ($group <= $arr['count']['groups']) {
+            $stmt->nextRowset();
+            $arr['list'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            return false;
+        }
 
         if (sizeof($arr['list']) < $arr['count']['students_per_group']) {
             return true;
