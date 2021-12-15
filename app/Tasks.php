@@ -115,11 +115,12 @@ class Tasks
         $msg = [];
         $this->studentId = $id;
         $post['studentGroup'] == 0 ? $this->updateGroup = null : $this->updateGroup = htmlspecialchars(strip_tags($post['studentGroup']));
+        $inputId = htmlspecialchars(strip_tags($post['projectId']));
 
         if ($this->updateGroup == null) {
             $this->execUpdateStudent();
         } else {
-            if ($this->freeGroup($post['projectId'], $post['studentGroup'])) {
+            if ($this->freeGroup($inputId, $post['studentGroup'])) {
                 $this->execUpdateStudent();
                 return $msg['msg'] = "Group changed";
             } else {
@@ -198,13 +199,18 @@ class Tasks
         $stmt->bindParam(':group', $this->validationGroup, PDO::PARAM_INT);
         $stmt->execute();
         $arr['count'] = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($group <= $arr['count']['groups']) {
-            $stmt->nextRowset();
-            $arr['list'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (filter_var($group, FILTER_VALIDATE_INT) !== false) {
+            if ($group <= $arr['count']['groups'] && $group >= 0) {
+                $stmt->nextRowset();
+                $arr['list'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
+
 
         if (sizeof($arr['list']) < $arr['count']['students_per_group']) {
             return true;
