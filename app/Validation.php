@@ -24,7 +24,7 @@ class Validation
 
     private static function title($e)
     {
-        $val = preg_match('/^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ0-9 ]{3,50}$/', $e);
+        $val = preg_match('/^[a-zA-ZąčęėįšųūžĄČĘĖĮŠŲŪŽ0-9 ]{3,25}$/', $e);
 
         if (empty($e)) {
             Validation::$errors['name'] = 'Title field is empty';
@@ -37,12 +37,12 @@ class Validation
 
     private static function groups($e)
     {
-        $val = preg_match('/^[0-9]{1,3}$/', $e);
+        $val = preg_match('/^(?:[1-9]|[1-2][0-9]|30)$/', $e);
 
         if (empty($e)) {
             Validation::$errors['groups'] = 'Groups field is empty';
         } elseif (!$val) {
-            Validation::$errors['groups'] = 'Groups can only contain numbers';
+            Validation::$errors['groups'] = 'Groups can only contain numbers from 1 to 30';
         } else {
             Validation::$errors['groups'] = '';
         }
@@ -50,12 +50,12 @@ class Validation
 
     private static function studentsPerGroup($e)
     {
-        $val = preg_match('/^[0-9]{1,3}$/', $e);
+        $val = preg_match('/^(?:[1-9]|[1-2][0-9]|30)$/', $e);
 
         if (empty($e)) {
             Validation::$errors['stpergroup'] = 'Students per group field is empty';
         } elseif (!$val) {
-            Validation::$errors['stpergroup'] = 'Students per group can only contain numbers';
+            Validation::$errors['stpergroup'] = 'Students per group can only contain numbers from 1 to 30';
         } else {
             Validation::$errors['stpergroup'] = '';
         }
